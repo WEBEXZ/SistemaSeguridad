@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<title>Streaming</title>
+	<style>
+		video{display: none;}
+	</style>
+</head>
+<body>
+	<video autoplay></video>
+	<canvas id="frame" witdh = '800' height = '600'></canvas>
+	<script src="http://localhost:8070/socket.io/socket.io.js"></script>
+	<script>
+		var flag = 0;
+		var websocket = io.connect("http://localhost:8070");
+		window.URL = window.URL || window.webkitURL;
+		navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+		navigator.getUserMedia({audio: true, video: true}, function(video){
+			flag = 1;
+			document.querySelector('video').src = window.URL.createObjectURL(video);
+		}, function(){
+			console.warn('Error al procesar el video');
+		});
+
+		window.requestAnimationFrame = (function(callback){
+			return window.requestAnimationFrame ||
+				window.webkitRequestAnimationFrame ||
+				window.mozRequestAnimationFrame ||
+				window.oRequestAnimationFrame ||
+				window.msRequestAnimationFrame ||
+				function(callback){
+					window.setTimeout(callback, 1000 / 100);
+				};
+		})();
+
+		function doFrame(contexto, video, canvas){
+			contexto.drawImage(video,0,0);
+			var dataURL = canvas.toDataURL('image/jpeg', 0.2);
+			if(flag!==0) websocket.emit('newFrame', dataURL);
+			requestAnimationFrame(function(){
+				doFrame(contexto, video, canvas);
+			});
+		}
+
+		window.addEventListener('load', init);
+		function init(){
+			var canvas = document.querySelector('#frame');
+			var video = document.querySelector('video');
+			var contexto = canvas.getContext('2d');
+			doFrame(contexto, video, canvas);
+		}
+	</script>
+</body>
+</html>

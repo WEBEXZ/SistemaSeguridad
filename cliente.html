@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<title>Cliente</title>
+	<style>
+		video{display: none;}
+	</style>
+</head>
+<body>
+	<img id = 'miImagen'>
+	<script src = "http://localhost:8070/socket.io/socket.io.js"></script>
+	<script>
+		var websocket = io.connect("http://localhost:8070");
+		websocket.on('setFrame', procesar);
+		function procesar(imagen){
+			document.querySelector('#miImagen').src = imagen;
+		}
+	</script>
+</body>
+</html>
