@@ -1,2 +1,2 @@
-# SistemaSeguridad
-Sistema de seguridad
+# Sistema de Seguridad
+Utilizando NodeJS, express, socket.io, etc.
